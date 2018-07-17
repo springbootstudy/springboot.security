@@ -25,8 +25,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	private UserDetailsService userDetailsService;
 	
+//	@Autowired
+//	private MyAuthenticationProvider authenticationProvider;
+	
 	@Autowired
-	private MyAuthenticationProvider authenticationProvider;
+	private LoginAuthenticationProvider authenticationProvider;
 	
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
