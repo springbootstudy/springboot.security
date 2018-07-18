@@ -9,6 +9,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import com.ctsi.springboot.security.filter.JwtAuthenticationFilter;
+import com.ctsi.springboot.security.filter.JwtLoginFilter;
+
 /**
  * 
  * @author lb
@@ -30,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private LoginAuthenticationProvider authenticationProvider;
-	
+		
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 //		logger.info("@@ configureGlobal");
@@ -133,9 +136,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.authorizeRequests()  // 定义哪些URL需要被保护、哪些不需要被保护
 				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
 				.antMatchers("/index").hasRole("admin")
-				.anyRequest().authenticated();  // 任何请求,登录后可以访问
+				.anyRequest().authenticated()  // 任何请求,登录后可以访问
+				.and()
+				.addFilter(new JwtLoginFilter(authenticationManager()))  //验证登陆  
+				.addFilter(new JwtAuthenticationFilter(authenticationManager()));  //验证token
 				
 	}
+	
+//	@Bean
+//	public AuthenticationManager getAuthenticationManager() throws Exception {
+//		logger.info("@@ getAuthenticationManager 注入对象 " + authenticationManager());
+//		return authenticationManager();
+//	}
 
 //	@Override
 //	public void setApplicationContext(ApplicationContext context) {

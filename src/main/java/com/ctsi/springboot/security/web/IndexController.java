@@ -28,6 +28,13 @@ public class IndexController {
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
 	
+	@RequestMapping("/welcome")
+	public ResponseEntity<String> welcome(HttpSession session) {
+		logger.info("## Welcome " + session.getId());
+		
+		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
+	}
+	
 	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public Object login(@RequestBody User user) {
 		String username = user.getUsername();
