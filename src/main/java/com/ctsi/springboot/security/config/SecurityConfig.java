@@ -3,13 +3,14 @@ package com.ctsi.springboot.security.config;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
-import com.ctsi.springboot.security.filter.JwtAuthenticationFilter;
 import com.ctsi.springboot.security.filter.JwtLoginFilter;
 
 /**
@@ -33,6 +34,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private LoginAuthenticationProvider authenticationProvider;
+	
+//	@Autowired
+//	private MyAccessDecisionManager accessDecisionManager;
+	
+	@Autowired
+	private SsdcAuthenticationSuccessHandler ssdcAuthenticationSuccessHandler;
+	@Autowired
+	private SsdcAuthenticationFailureHandler ssdcAuthenticationFailureHandler;
 		
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -129,17 +138,42 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		logger.info("@@ configure HttpSecurity ");
 //		super.configure(http);
 		
-		http.formLogin()  //  定义当需要用户登录时候，转到的登录页面
-//				.loginPage("/login.html")  // 设置登录页面
-				.loginProcessingUrl("/login")  // 自定义的登录接口
+//		http.authorizeRequests()
+//				.accessDecisionManager(accessDecisionManager);
+		http.exceptionHandling().authenticationEntryPoint(new SsdcLoginUrlAuthenticationEntryPoint(loginFormUrl));
+		http
+		/*
+		 * 这里不能使用 http.formLogin() 这个进行设置
+		 * 此设置是 Spring Security 的 UsernamePassword 默认使用方式，参数名(username, password)，请求方式(post 必须是表单提交)
+		 * 下面的过滤器 JwtLoginFilter, JwtAuthenticationFilter 都是针对 UsernamePassword 这种方式的；
+		 */
+		 .formLogin()  //  定义当需要用户登录时候，转到的登录页面
+				//.loginPage("/login.html")  // 设置登录页面
+				.loginProcessingUrl("/mylogin")  // 自定义的登录接口
+				.successHandler(ssdcAuthenticationSuccessHandler)
+				.failureHandler(ssdcAuthenticationFailureHandler)
+				.usernameParameter("u")
+				.passwordParameter("p")
 				.and()
+				
 				.authorizeRequests()  // 定义哪些URL需要被保护、哪些不需要被保护
-				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
+//				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
+				.antMatchers("/mylogin", "/login").permitAll()
+				.antMatchers(HttpMethod.POST, "/hello").permitAll()  // csrf 禁用才有效果
 				.antMatchers("/index").hasRole("admin")
+				
 				.anyRequest().authenticated()  // 任何请求,登录后可以访问
+				
 				.and()
-				.addFilter(new JwtLoginFilter(authenticationManager()))  //验证登陆  
-				.addFilter(new JwtAuthenticationFilter(authenticationManager()));  //验证token
+				.addFilter(new JwtLoginFilter(authenticationManager()));  //验证登陆  
+//				.addFilter(new JwtAuthenticationFilter(authenticationManager()));  //验证token
+		
+		/*
+		 * 关闭，可以访问 post 请求
+		 * 默认情况下启动跨域
+		 * 默认情况下只允许 get 类型请求，限制了除了 get 以外的大多数方法
+		 */
+		http.csrf().disable(); 
 				
 	}
 	

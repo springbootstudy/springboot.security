@@ -62,7 +62,7 @@ public class LoginAuthenticationProvider extends
 		String password = authentication.getCredentials().toString();
 		log.info("$$$$ " + username + ", " + password);
 		
-		Optional<UserDetails> loadedUser = null;
+		UserDetails loadedUser = null;
 		try {
 			loadedUser = loginUserDetailsService.loadUserByUsername(username, password);
 		}
@@ -75,12 +75,12 @@ public class LoginAuthenticationProvider extends
 			throw new AuthenticationServiceException(e.getMessage(), e);
 		}
 		
-		if (null == loadedUser.get()) {
+		if (null == loadedUser) {
 			throw new AuthenticationServiceException(
                     "UserDetailsService returned null, which is an interface contract violation");
 		}
 		
-		return loadedUser.get();
+		return loadedUser;
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.ctsi.springboot.security.service;
 
-import java.util.Optional;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -21,6 +19,6 @@ public interface LoginUserDetailsService {
 	 * @return
 	 * @throws UsernameNotFoundException
 	 */
-	Optional<UserDetails> loadUserByUsername(String username, String password) throws UsernameNotFoundException;
+	UserDetails loadUserByUsername(String username, String password) throws UsernameNotFoundException;
 
 }

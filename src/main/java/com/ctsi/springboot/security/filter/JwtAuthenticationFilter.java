@@ -37,7 +37,8 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 			HttpServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		log.info("++++ doFilterInternal");
-		super.doFilterInternal(request, response, chain);
+//		super.doFilterInternal(request, response, chain);
+		chain.doFilter(request, response);
 	}
 
 }

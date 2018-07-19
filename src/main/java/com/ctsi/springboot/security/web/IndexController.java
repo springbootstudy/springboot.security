@@ -28,6 +28,20 @@ public class IndexController {
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/hello", method = RequestMethod.POST)
+	public ResponseEntity<String> hello(HttpSession session) {
+		logger.info("## Hello " + session.getId());
+		
+		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/world", method = RequestMethod.POST)
+	public ResponseEntity<String> world(HttpSession session) {
+		logger.info("## World " + session.getId());
+		
+		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
+	}
+	
 	@RequestMapping("/welcome")
 	public ResponseEntity<String> welcome(HttpSession session) {
 		logger.info("## Welcome " + session.getId());
@@ -93,6 +107,58 @@ public class IndexController {
 	
 	@RequestMapping("/login")
 	public Object login(String username, String passwd) {
+		logger.info("## get login " + username + ", " + passwd);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		// 通过认证的账号
+		if ("a".equals(username) && "b".equals(passwd)) {
+//			logger.info("## token flag " + filterConfig.isFilterToken());
+//			if (filterConfig.isFilterToken()) {
+//				Map<String, Object> claims = new HashMap<>();
+//				String token = JwtUtil.generateToken(claims);
+////				logger.info("## " + token);
+//				
+//				map.put("token", token);
+//			}
+		}
+		// 不通过
+		else {
+			map.put("error", HttpStatus.UNAUTHORIZED);
+		}
+		
+		return map;
+	}
+	
+	@RequestMapping("/mylogin")
+	public Object mylogin(String username, String passwd) {
+		logger.info("## get mylogin " + username + ", " + passwd);
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		// 通过认证的账号
+		if ("a".equals(username) && "b".equals(passwd)) {
+//			logger.info("## token flag " + filterConfig.isFilterToken());
+//			if (filterConfig.isFilterToken()) {
+//				Map<String, Object> claims = new HashMap<>();
+//				String token = JwtUtil.generateToken(claims);
+////				logger.info("## " + token);
+//				
+//				map.put("token", token);
+//			}
+		}
+		// 不通过
+		else {
+			map.put("error", HttpStatus.UNAUTHORIZED);
+		}
+		
+		return map;
+	}
+	
+	@RequestMapping(value = "/mylogin", method = RequestMethod.POST)
+	public Object mylogin(@RequestBody User user) {
+		String username = user.getUsername();
+		String passwd = user.getPasswd();
 		logger.info("## get login " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();

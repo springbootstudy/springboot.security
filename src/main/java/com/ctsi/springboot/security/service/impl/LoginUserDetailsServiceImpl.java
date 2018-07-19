@@ -2,7 +2,6 @@ package com.ctsi.springboot.security.service.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,18 +26,18 @@ public class LoginUserDetailsServiceImpl implements LoginUserDetailsService {
 	private static final Logger log = Logger.getLogger(LoginUserDetailsServiceImpl.class);
 
 	@Override
-	public Optional<UserDetails> loadUserByUsername(String username, String password)
+	public UserDetails loadUserByUsername(String username, String password)
 			throws UsernameNotFoundException {
 		log.info("### 加载用户信息");
 		if (!validate(username, password)) {
-			return Optional.empty();
+			return null;
 		}
 		
 		Collection<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
 		authorities.add(new SimpleGrantedAuthority("admin"));
 		LoginUserDetails user = new LoginUserDetails(username, password, authorities);
 		
-		return Optional.ofNullable(user);
+		return user;
 	}
 	
 	private boolean validate(String username, String password) {
