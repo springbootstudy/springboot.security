@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import com.ctsi.springboot.security.filter.JwtLoginFilter;
 
@@ -42,6 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	private SsdcAuthenticationSuccessHandler ssdcAuthenticationSuccessHandler;
 	@Autowired
 	private SsdcAuthenticationFailureHandler ssdcAuthenticationFailureHandler;
+	@Autowired
+	private SsdcLoginUrlAuthenticationEntryPoint ssdcLoginUrlAuthenticationEntryPoint;
 		
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -140,7 +141,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 //		http.authorizeRequests()
 //				.accessDecisionManager(accessDecisionManager);
-		http.exceptionHandling().authenticationEntryPoint(new SsdcLoginUrlAuthenticationEntryPoint(loginFormUrl));
+		
+		/*
+		 * 默认情况下验证要跳转到登录页面，这里设置为自定义的方式
+		 */
+		http.exceptionHandling().authenticationEntryPoint(ssdcLoginUrlAuthenticationEntryPoint);
+		
 		http
 		/*
 		 * 这里不能使用 http.formLogin() 这个进行设置
