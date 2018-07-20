@@ -22,6 +22,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @author lb
  *
  * @since 2018年7月18日
+ * 
+ * 该 Filter 只能过滤 /login POST 请求
  *
  */
 public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
@@ -35,7 +37,6 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
 //	}
 	
 	public JwtLoginFilter(AuthenticationManager authenticationManager) {
-		log.info("%%%% 2 " + this.authenticationManager + ", " + authenticationManager);
 		this.authenticationManager = authenticationManager;
 	}
 	
@@ -49,6 +50,10 @@ public class JwtLoginFilter extends UsernamePasswordAuthenticationFilter {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         log.info("%%%% " + username + ", " + password);
+        
+        String username2 = request.getParameter("u");
+        String password2 = request.getParameter("p");
+        log.info("%%%% " + username2 + ", " + password2);
 
         if (username == null) {
             username = "";

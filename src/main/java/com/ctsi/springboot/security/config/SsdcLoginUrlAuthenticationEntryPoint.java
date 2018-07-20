@@ -41,7 +41,7 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 		log.info("0000 重写");
 		response.setContentType("application/json;charset=UTF-8");
 		
-		log.info("## token为空");
+		log.info("0000 token为空");
 		AjaxData ajaxData = null;
 		try ( Writer writer = response.getWriter() ) {
 			ajaxData = new AjaxData(1000, "请登录系统");
@@ -51,7 +51,7 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 			ex.printStackTrace();
 		}
 		
-		this.isAjaxRequest(request);
+//		this.isAjaxRequest(request);
 	}
 	
 	/**

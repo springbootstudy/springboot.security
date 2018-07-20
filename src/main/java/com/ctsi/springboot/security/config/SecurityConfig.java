@@ -4,13 +4,15 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.ctsi.springboot.security.filter.JwtLoginFilter;
+import com.ctsi.springboot.security.authentication.SsdcAuthenticationFilter;
+import com.ctsi.springboot.security.authentication.SsdcAuthenticationProvider;
 
 /**
  * 
@@ -25,22 +27,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private static final Logger logger = Logger.getLogger(SecurityConfig.class);
 	
-	@Autowired
-	private UserDetailsService userDetailsService;
-	
 //	@Autowired
-//	private MyAuthenticationProvider authenticationProvider;
+//	private UserDetailsService userDetailsService;
 	
 	@Autowired
-	private LoginAuthenticationProvider authenticationProvider;
+	private SsdcAuthenticationProvider ssdcAuthenticationProvider;
+//	@Autowired
+//	private SsdcAuthenticationFilter ssdcAuthenticationFilter;
+	
+	@Autowired
+	private LoginAuthenticationProvider loginauthenticationProvider;
 	
 //	@Autowired
 //	private MyAccessDecisionManager accessDecisionManager;
 	
-	@Autowired
-	private SsdcAuthenticationSuccessHandler ssdcAuthenticationSuccessHandler;
-	@Autowired
-	private SsdcAuthenticationFailureHandler ssdcAuthenticationFailureHandler;
+//	@Autowired
+//	private SsdcAuthenticationSuccessHandler ssdcAuthenticationSuccessHandler;
+//	@Autowired
+//	private SsdcAuthenticationFailureHandler ssdcAuthenticationFailureHandler;
+	
 	@Autowired
 	private SsdcLoginUrlAuthenticationEntryPoint ssdcLoginUrlAuthenticationEntryPoint;
 		
@@ -92,7 +97,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// end 数据库方式
 		
 		// start 自定义方式
-		auth.authenticationProvider(authenticationProvider);
+		auth.authenticationProvider(ssdcAuthenticationProvider);
+//		auth.authenticationProvider(loginauthenticationProvider);
 		// end 自定义方式
 	}
 
@@ -133,7 +139,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //		logger.info("@@ configure WebSecurity ");
 //		super.configure(web);
 //	}
-
+	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		logger.info("@@ configure HttpSecurity ");
@@ -153,26 +159,29 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 * 此设置是 Spring Security 的 UsernamePassword 默认使用方式，参数名(username, password)，请求方式(post 必须是表单提交)
 		 * 下面的过滤器 JwtLoginFilter, JwtAuthenticationFilter 都是针对 UsernamePassword 这种方式的；
 		 */
-		 .formLogin()  //  定义当需要用户登录时候，转到的登录页面
+//		 .formLogin()  //  定义当需要用户登录时候，转到的登录页面
 				//.loginPage("/login.html")  // 设置登录页面
-				.loginProcessingUrl("/mylogin")  // 自定义的登录接口
-				.successHandler(ssdcAuthenticationSuccessHandler)
-				.failureHandler(ssdcAuthenticationFailureHandler)
-				.usernameParameter("u")
-				.passwordParameter("p")
-				.and()
+//				.loginProcessingUrl("/logine")  // 自定义的登录接口
+//				.successHandler(ssdcAuthenticationSuccessHandler)
+//				.failureHandler(ssdcAuthenticationFailureHandler)
+//				.usernameParameter("u")
+//				.passwordParameter("p")
+//				.and()
 				
 				.authorizeRequests()  // 定义哪些URL需要被保护、哪些不需要被保护
 //				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
-				.antMatchers("/mylogin", "/login").permitAll()
+				.antMatchers("/login", "/logine").permitAll()
 				.antMatchers(HttpMethod.POST, "/hello").permitAll()  // csrf 禁用才有效果
 				.antMatchers("/index").hasRole("admin")
 				
-				.anyRequest().authenticated()  // 任何请求,登录后可以访问
+				.anyRequest().authenticated();  // 任何请求,登录后可以访问
 				
-				.and()
-				.addFilter(new JwtLoginFilter(authenticationManager()));  //验证登陆  
+//				.and()
+//				http.addFilter(new JwtLoginFilter(authenticationManager()));  //验证登陆  
 //				.addFilter(new JwtAuthenticationFilter(authenticationManager()));  //验证token
+		
+//		http.addFilter(ssdcAuthenticationFilter);
+		http.addFilterBefore(ssdcAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
 		
 		/*
 		 * 关闭，可以访问 post 请求
@@ -181,6 +190,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 */
 		http.csrf().disable(); 
 				
+	}
+	
+	// 配置封装 SsdcAuthenticationFilter 的过滤器
+	protected SsdcAuthenticationFilter ssdcAuthenticationFilter(	AuthenticationManager authenticationManager) {
+		SsdcAuthenticationFilter ssdcAuthenticationFilter = new SsdcAuthenticationFilter();
+		// 为过滤器添加认证器
+		ssdcAuthenticationFilter.setAuthenticationManager(authenticationManager);
+		// 重写认证失败时的跳转页面
+//		ssdcAuthenticationFilter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/ipLogin?error"));
+		return ssdcAuthenticationFilter;
 	}
 	
 //	@Bean

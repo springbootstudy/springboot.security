@@ -1,7 +1,5 @@
 package com.ctsi.springboot.security.config;
 
-import java.util.Optional;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationServiceException;

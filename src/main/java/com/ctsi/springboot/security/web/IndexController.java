@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ctsi.springboot.security.util.JwtUtil;
+
 @RestController
 public class IndexController {
 	
@@ -60,14 +62,10 @@ public class IndexController {
 		
 		// 通过认证的账号
 		if ("a".equals(username) && "b".equals(passwd)) {
-//			logger.info("## token flag " + filterConfig.isFilterToken());
-//			if (filterConfig.isFilterToken()) {
-//				Map<String, Object> claims = new HashMap<>();
-//				String token = JwtUtil.generateToken(claims);
-////				logger.info("## " + token);
-//				
-//				map.put("token", token);
-//			}
+			Map<String, Object> claims = new HashMap<>();
+			String token = JwtUtil.generateToken(claims);
+
+			map.put("token", token);
 		}
 		// 不通过
 		else {
@@ -82,20 +80,17 @@ public class IndexController {
 		String username = user.getUsername();
 		String passwd = user.getPasswd();
 		
-		logger.info("## post login " + username + ", " + passwd);
+		logger.info("## post logine " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
 		// 通过认证的账号
 		if ("a".equals(username) && "b".equals(passwd)) {
-//			logger.info("## token flag " + filterConfig.isFilterToken());
-//			if (filterConfig.isFilterToken()) {
-//				Map<String, Object> claims = new HashMap<>();
-//				String token = JwtUtil.generateToken(claims);
-////				logger.info("## " + token);
-//				
-//				map.put("token", token);
-//			}
+			Map<String, Object> claims = new HashMap<>();
+			String token = JwtUtil.generateToken(claims);
+			// logger.info("## " + token);
+
+			map.put("token", token);
 		}
 		// 不通过
 		else {

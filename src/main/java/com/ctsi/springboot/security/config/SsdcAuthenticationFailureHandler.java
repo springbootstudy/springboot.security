@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
  *
  * @since 2018年7月19日
  *
- *验证失败的处理
+ * 登录验证失败的处理
  *
  */
 @Component
