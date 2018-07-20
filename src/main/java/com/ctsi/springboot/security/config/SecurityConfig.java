@@ -31,12 +31,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //	private UserDetailsService userDetailsService;
 	
 	@Autowired
-	private SsdcAuthenticationProvider ssdcAuthenticationProvider;
-//	@Autowired
-//	private SsdcAuthenticationFilter ssdcAuthenticationFilter;
+	private SsdcLoginUrlAuthenticationEntryPoint ssdcLoginUrlAuthenticationEntryPoint;
 	
 	@Autowired
-	private LoginAuthenticationProvider loginauthenticationProvider;
+	private SsdcAuthenticationProvider ssdcAuthenticationProvider;
+	
+//	@Autowired
+//	private LoginAuthenticationProvider loginauthenticationProvider;
 	
 //	@Autowired
 //	private MyAccessDecisionManager accessDecisionManager;
@@ -46,9 +47,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //	@Autowired
 //	private SsdcAuthenticationFailureHandler ssdcAuthenticationFailureHandler;
 	
-	@Autowired
-	private SsdcLoginUrlAuthenticationEntryPoint ssdcLoginUrlAuthenticationEntryPoint;
-		
 //	@Autowired
 //	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 //		logger.info("@@ configureGlobal");

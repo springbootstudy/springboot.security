@@ -1,8 +1,10 @@
 package com.ctsi.springboot.security.authentication;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.Enumeration;
 
+import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -12,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import com.ctsi.springboot.security.util.JacksonUtil;
 
 /**
  * 
@@ -27,7 +31,7 @@ public class SsdcAuthenticationFilter extends
 	private static final Logger log = Logger.getLogger(SsdcAuthenticationFilter.class);
 
 	public SsdcAuthenticationFilter() {
-		// GET 请求方式
+		// 过滤 GET 请求方式
 		super(new AntPathRequestMatcher("/logine"));
 		log.info("ssdc #### ");
 	}
@@ -59,9 +63,26 @@ public class SsdcAuthenticationFilter extends
 		user.setUsername(username);
 		user.setPasswd(passwd);
 		
-		SsdcAuthenticationToken ssdcAuthenticationToken = new SsdcAuthenticationToken(user);
+		Authentication ssdcAuthenticationToken = new SsdcAuthenticationToken(user);
 		
 		return getAuthenticationManager().authenticate(ssdcAuthenticationToken);
+	}
+	
+	@Override
+	protected void successfulAuthentication(HttpServletRequest request,
+			HttpServletResponse response, FilterChain chain,
+			Authentication authResult) throws IOException, ServletException {
+		log.info("ssdc successfulAuthentication #### ");
+//		super.successfulAuthentication(request, response, chain, authResult);
+		
+		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
+		
+		// 这里应该生成 Token 并返回
+		try (Writer writer = response.getWriter()) {
+			writer.write("OK Token");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 }
