@@ -36,8 +36,12 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 			e.printStackTrace();
 		}
 		
+		/*
+		 * 认证的实现
+		 */
 		SsdcAuthenticationToken auth = (SsdcAuthenticationToken) authentication;
 		
+		// 认证成功后的 Authentication 对象
 		return new SsdcAuthenticationToken(auth.getUser(), Collections.emptyList());
 	}
 

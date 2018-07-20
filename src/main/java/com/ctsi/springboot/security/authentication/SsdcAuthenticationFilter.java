@@ -63,6 +63,7 @@ public class SsdcAuthenticationFilter extends
 		user.setUsername(username);
 		user.setPasswd(passwd);
 		
+		// 认证之前的 Authentication 对象
 		Authentication ssdcAuthenticationToken = new SsdcAuthenticationToken(user);
 		
 		return getAuthenticationManager().authenticate(ssdcAuthenticationToken);
