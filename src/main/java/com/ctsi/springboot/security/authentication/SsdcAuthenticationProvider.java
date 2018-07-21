@@ -2,14 +2,18 @@ package com.ctsi.springboot.security.authentication;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import com.ctsi.springboot.security.util.JacksonUtil;
+import com.ctsi.springboot.security.util.JwtUtil;
 
 /**
  * 
@@ -40,9 +44,18 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 		 * 认证的实现
 		 */
 		SsdcAuthenticationToken auth = (SsdcAuthenticationToken) authentication;
+		SsdcUser user = auth.getUser();
 		
-		// 认证成功后的 Authentication 对象
-		return new SsdcAuthenticationToken(auth.getUser(), Collections.emptyList());
+		// 通过认证的账号
+		if ("a".equals(user.getUsername()) && "b".equals(user.getPasswd())) {
+			// 认证成功后的 Authentication 对象
+			return new SsdcAuthenticationToken(auth.getUser(), Collections.emptyList());
+		}
+		// 不通过
+		else {
+		}
+		
+		return null;
 	}
 
 	@Override

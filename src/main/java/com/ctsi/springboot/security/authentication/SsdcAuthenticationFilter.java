@@ -3,6 +3,8 @@ package com.ctsi.springboot.security.authentication;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -16,6 +18,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.ctsi.springboot.security.util.JacksonUtil;
+import com.ctsi.springboot.security.util.JwtUtil;
 
 /**
  * 
@@ -76,14 +79,18 @@ public class SsdcAuthenticationFilter extends
 		log.info("ssdc successfulAuthentication #### ");
 //		super.successfulAuthentication(request, response, chain, authResult);
 		
+		Map<String, Object> claims = new HashMap<>();
+		String token = JwtUtil.generateToken(claims);
+		
 		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
 		
 		// 这里应该生成 Token 并返回
 		try (Writer writer = response.getWriter()) {
-			writer.write("OK Token");
-		} catch (Exception ex) {
+			writer.write(token);
+		} 
+		catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-
+	
 }
