@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationFilter;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationProvider;
+import com.ctsi.springboot.security.authentication.SsdcAuthenticationTokenFilter;
 
 /**
  * 
@@ -180,6 +181,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 //		http.addFilter(ssdcAuthenticationFilter);
 		http.addFilterBefore(ssdcAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+		http.addFilterAfter(new SsdcAuthenticationTokenFilter(authenticationManager()), SsdcAuthenticationFilter.class);
 		
 		/*
 		 * 关闭，可以访问 post 请求

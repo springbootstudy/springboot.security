@@ -2,18 +2,14 @@ package com.ctsi.springboot.security.authentication;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import com.ctsi.springboot.security.util.JacksonUtil;
-import com.ctsi.springboot.security.util.JwtUtil;
 
 /**
  * 
@@ -53,6 +49,7 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 		}
 		// 不通过
 		else {
+			
 		}
 		
 		return null;
