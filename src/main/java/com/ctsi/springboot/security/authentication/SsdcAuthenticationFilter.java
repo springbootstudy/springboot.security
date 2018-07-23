@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -44,6 +45,7 @@ public class SsdcAuthenticationFilter extends
 			HttpServletResponse response) throws AuthenticationException,
 			IOException, ServletException {
 		
+		// 请求中的所有参数
 		Enumeration<String> names = request.getParameterNames();
 		while (names.hasMoreElements()) {
 			String name = names.nextElement();
@@ -78,11 +80,20 @@ public class SsdcAuthenticationFilter extends
 			Authentication authResult) throws IOException, ServletException {
 		log.info("ssdc successfulAuthentication #### ");
 //		super.successfulAuthentication(request, response, chain, authResult);
+		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
+		
+		SsdcAuthenticationToken sat = (SsdcAuthenticationToken) authResult;
+		sat.getUser().setPasswd(null);
+		
+		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
+		
+		SecurityContextHolder.getContext().setAuthentication(sat);
+		
 		
 		Map<String, Object> claims = new HashMap<>();
+		claims.put("username", sat.getUser().getUsername());
 		String token = JwtUtil.generateToken(claims);
 		
-		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
 		
 		// 这里应该生成 Token 并返回
 		try (Writer writer = response.getWriter()) {

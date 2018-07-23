@@ -171,7 +171,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
 				.antMatchers("/login", "/logine").permitAll()
 				.antMatchers(HttpMethod.POST, "/hello").permitAll()  // csrf 禁用才有效果
-				.antMatchers("/index").hasRole("admin")
+//				.antMatchers("/index").hasRole("admin")
 				
 				.anyRequest().authenticated();  // 任何请求,登录后可以访问
 				
