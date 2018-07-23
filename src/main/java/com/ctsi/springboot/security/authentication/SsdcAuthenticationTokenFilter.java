@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.StringUtils;
@@ -49,8 +50,8 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 		
 		if (StringUtils.isEmpty(token)) {
 			log.info("ssdc ####  token为空");
-			filterChain.doFilter(request, response);
-			return;
+//			filterChain.doFilter(request, response);
+//			return;
 		}
 		else {
 			try {
@@ -58,12 +59,18 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 				String username = (String) claims.get("username");
 				log.info("ssdc #### " + username);
 				
-				SsdcUser user = new SsdcUser();
-				user.setUsername(username);
-				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(user, Collections.emptyList());
+//				SsdcUser user = new SsdcUser();
+//				user.setUsername(username);
+//				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(user, Collections.emptyList());
+				
+				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+				log.info("ssdc #### " + auth);
+				log.info("ssdc #### " + JacksonUtil.bean2Json(auth));
+				
+				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(null, Collections.emptyList());
 				log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
 				SecurityContextHolder.getContext().setAuthentication(sat);
-				filterChain.doFilter(request, response);
+//				filterChain.doFilter(request, response);
 			}
 			catch (ExpiredJwtException ex) {
 				log.info("ssdc ####  token 过期");
@@ -75,7 +82,7 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 			}
 		}
 		
-//		filterChain.doFilter(request, response);
+		filterChain.doFilter(request, response);
 	}
 
 }

@@ -189,6 +189,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 * 默认情况下只允许 get 类型请求，限制了除了 get 以外的大多数方法
 		 */
 		http.csrf().disable(); 
+		
+		http.rememberMe();
 				
 	}
 	

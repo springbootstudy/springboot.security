@@ -36,7 +36,7 @@ public class SsdcAuthenticationToken extends AbstractAuthenticationToken {
 	
 	public SsdcAuthenticationToken(SsdcUser user) {
 		super(null);
-		log.info("ssdc #### " + user.getUsername() + ", " + user.getPasswd());
+//		log.info("ssdc #### " + user.getUsername() + ", " + user.getPasswd());
 //		this.eUsername = eUsername;
 //		this.ePassword = ePassword;
 		this.user = user;
@@ -46,7 +46,7 @@ public class SsdcAuthenticationToken extends AbstractAuthenticationToken {
 	public SsdcAuthenticationToken(SsdcUser user,
 			Collection<? extends GrantedAuthority> authorities) {
 		super(authorities);
-		log.info("ssdc #### 2 " + user.getUsername() + ", " + user.getPasswd());
+//		log.info("ssdc #### 2 " + user.getUsername() + ", " + user.getPasswd());
 		// this.eUsername = eUsername;
 		// this.ePassword = ePassword;
 		this.user = user;

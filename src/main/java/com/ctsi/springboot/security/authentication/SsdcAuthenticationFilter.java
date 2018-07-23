@@ -87,7 +87,7 @@ public class SsdcAuthenticationFilter extends
 		
 		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
 		
-		SecurityContextHolder.getContext().setAuthentication(sat);
+//		SecurityContextHolder.getContext().setAuthentication(sat);
 		
 		
 		Map<String, Object> claims = new HashMap<>();

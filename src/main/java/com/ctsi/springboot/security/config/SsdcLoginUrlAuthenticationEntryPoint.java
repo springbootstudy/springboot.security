@@ -38,7 +38,7 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 	public void commence(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException authException)
 			throws IOException, ServletException {
-		log.info("0000 重写");
+//		log.info("0000 重写");
 		response.setContentType("application/json;charset=UTF-8");
 		
 		log.info("0000 token为空");
