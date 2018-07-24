@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -40,11 +41,25 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 			throws IOException, ServletException {
 //		log.info("0000 重写");
 		response.setContentType("application/json;charset=UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");  
+		
+		// 判定是否预检请求
+		if ("OPTIONS".equals(request.getMethod())) {
+			log.info("## 处理预检");
+			response.setStatus(HttpStatus.NO_CONTENT.value());
+			//当判定为预检请求后，设定允许请求的头部类型
+			response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-requested-with, Token"); 
+			//当判定为预检请求后，设定允许请求的方法
+			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS, DELETE");
+			// 单位秒
+			response.addHeader("Access-Control-Max-Age", "60"); 
+		}
 		
 		log.info("0000 token为空");
 		AjaxData ajaxData = null;
 		try ( Writer writer = response.getWriter() ) {
 			ajaxData = new AjaxData(1000, "请登录系统");
+			log.info("0000 " + JacksonUtil.bean2Json(ajaxData));
 			writer.write(JacksonUtil.bean2Json(ajaxData));
 		}
 		catch (Exception ex) {

@@ -12,12 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.ctsi.springboot.security.bean.AjaxData;
 import com.ctsi.springboot.security.util.JacksonUtil;
 import com.ctsi.springboot.security.util.JwtUtil;
 
@@ -37,7 +38,8 @@ public class SsdcAuthenticationFilter extends
 	public SsdcAuthenticationFilter() {
 		// 过滤 GET 请求方式
 		super(new AntPathRequestMatcher("/logine"));
-		log.info("ssdc #### ");
+//		super(new AntPathRequestMatcher("/logine", "POST"));
+//		log.info("ssdc #### ");
 	}
 
 	@Override
@@ -52,8 +54,8 @@ public class SsdcAuthenticationFilter extends
 			System.out.println(name + "#" + request.getParameter(name));
 		}
 		
-		String username = request.getParameter("u");
-		String passwd     = request.getParameter("p");
+		String username = request.getParameter("username");
+		String passwd     = request.getParameter("passwd");
 		log.info("ssdc attemptAuthentication #### " + username + ", " + passwd);
 		
 		if (username == null) {
@@ -79,25 +81,40 @@ public class SsdcAuthenticationFilter extends
 			HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
 		log.info("ssdc successfulAuthentication #### ");
-//		super.successfulAuthentication(request, response, chain, authResult);
+		
+		response.setContentType("application/json;charset=UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");
+//		response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-requested-with, Token"); 
 		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
 		
+		// 判定是否预检请求
+		if ("OPTIONS".equals(request.getMethod())) {
+			log.info("## 处理预检");
+			response.setStatus(HttpStatus.NO_CONTENT.value());
+			//当判定为预检请求后，设定允许请求的头部类型
+			response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-requested-with, Token"); 
+			//当判定为预检请求后，设定允许请求的方法
+			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS, DELETE");
+			// 单位秒
+			response.addHeader("Access-Control-Max-Age", "60"); 
+		}
+		
 		SsdcAuthenticationToken sat = (SsdcAuthenticationToken) authResult;
-		sat.getUser().setPasswd(null);
-		
-		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
-		
+//		sat.getUser().setPasswd(null);
+//		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
 //		SecurityContextHolder.getContext().setAuthentication(sat);
-		
 		
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("username", sat.getUser().getUsername());
 		String token = JwtUtil.generateToken(claims);
 		
+		AjaxData ajaxData = new AjaxData(0, "OK");
+		ajaxData.setToken(token);
 		
 		// 这里应该生成 Token 并返回
 		try (Writer writer = response.getWriter()) {
-			writer.write(token);
+			log.info("ssdc #### " + JacksonUtil.bean2Json(ajaxData));
+			writer.write(JacksonUtil.bean2Json(ajaxData));
 		} 
 		catch (Exception ex) {
 			ex.printStackTrace();

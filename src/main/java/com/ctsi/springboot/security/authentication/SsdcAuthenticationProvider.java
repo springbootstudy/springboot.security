@@ -34,7 +34,7 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
-		log.info("ssdc #### authenticate ");
+//		log.info("ssdc #### authenticate ");
 		try {
 			log.info("#### authenticate " + JacksonUtil.bean2Json(authentication));
 		} 

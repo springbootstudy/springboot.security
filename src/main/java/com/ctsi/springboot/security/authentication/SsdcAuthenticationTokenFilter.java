@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +49,21 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 		String token = request.getHeader("token");
 		log.info("ssdc #### " + method + ", " + request.getRequestURI() + ", " + token);
 		
+		response.setContentType("application/json;charset=UTF-8");
+		response.setHeader("Access-Control-Allow-Origin", "*");  
+		
+		// 判定是否预检请求
+		if ("OPTIONS".equals(request.getMethod())) {
+			log.info("## 处理预检");
+			response.setStatus(HttpStatus.NO_CONTENT.value());
+			//当判定为预检请求后，设定允许请求的头部类型
+			response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-requested-with, Token"); 
+			//当判定为预检请求后，设定允许请求的方法
+			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS, DELETE");
+			// 单位秒
+			response.addHeader("Access-Control-Max-Age", "60"); 
+		}
+		
 		if (StringUtils.isEmpty(token)) {
 			log.info("ssdc ####  token为空");
 //			filterChain.doFilter(request, response);
@@ -65,11 +81,14 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 				
 				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 				log.info("ssdc #### " + auth);
-				log.info("ssdc #### " + JacksonUtil.bean2Json(auth));
+				
 				
 				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(null, Collections.emptyList());
 				log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
 				SecurityContextHolder.getContext().setAuthentication(sat);
+				
+				auth = SecurityContextHolder.getContext().getAuthentication();
+				log.info("ssdc #### " + auth + ", " + JacksonUtil.bean2Json(auth));
 //				filterChain.doFilter(request, response);
 			}
 			catch (ExpiredJwtException ex) {
