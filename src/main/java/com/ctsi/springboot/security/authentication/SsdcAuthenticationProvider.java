@@ -11,6 +11,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.ctsi.springboot.security.authentication.SsdcAuthenticationToken.RequestType;
 import com.ctsi.springboot.security.service.SsdcUserDetailsService;
 import com.ctsi.springboot.security.util.JacksonUtil;
 
@@ -34,18 +35,20 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 	@Override
 	public Authentication authenticate(Authentication authentication)
 			throws AuthenticationException {
-//		log.info("ssdc #### authenticate ");
-		try {
-			log.info("#### authenticate " + JacksonUtil.bean2Json(authentication));
-		} 
-		catch (IOException e) {
-			e.printStackTrace();
+		log.info("AuthenticatonProvider 处理器");
+//		try {
+//			log.info("#### authenticate " + JacksonUtil.bean2Json(authentication));
+//		} 
+//		catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+		SsdcAuthenticationToken auth = (SsdcAuthenticationToken) authentication;
+		if (auth.getRequestType() == RequestType.OPTIONS) {
+			log.info("#### authenticate 预检请求 不调用认证 ");
+			return new SsdcAuthenticationToken(auth.getUser(), Collections.emptyList());
 		}
 		
-		/*
-		 * 认证的实现
-		 */
-		SsdcAuthenticationToken auth = (SsdcAuthenticationToken) authentication;
 		SsdcUser user = auth.getUser();
 		
 //		// 通过认证的账号
@@ -58,6 +61,9 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 //			
 //		}
 		
+		/*
+		 * 认证的实现
+		 */
 		UserDetails ud = ssdcUserDetailsService.loadUserByUser(user);
 //		try {
 //			log.info("#### authenticate " + JacksonUtil.bean2Json(ud));
@@ -74,7 +80,8 @@ public class SsdcAuthenticationProvider implements AuthenticationProvider {
 
 	@Override
 	public boolean supports(Class<?> authentication) {
-		log.info("ssdc #### supports " + authentication);
+//		log.info("ssdc #### supports " + authentication);
+		log.info("AuthenticatonProvider 处理器 支持的类型 " + authentication);
 //		return false;
 		return authentication.equals(SsdcAuthenticationToken.class);
 	}

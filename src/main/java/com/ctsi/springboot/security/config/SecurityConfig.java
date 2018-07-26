@@ -9,11 +9,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsUtils;
 
+import com.ctsi.springboot.security.authentication.SsdcAccessDeniedHandler;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationFilter;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationProvider;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationTokenFilter;
+import com.ctsi.springboot.security.authentication.SsdcLoginUrlAuthenticationEntryPoint;
 
 /**
  * 
@@ -33,6 +37,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	private SsdcLoginUrlAuthenticationEntryPoint ssdcLoginUrlAuthenticationEntryPoint;
+	
+	@Autowired
+	private SsdcAccessDeniedHandler ssdcAccessDeniedHandler;
 	
 	@Autowired
 	private SsdcAuthenticationProvider ssdcAuthenticationProvider;
@@ -149,8 +156,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		/*
 		 * 默认情况下验证要跳转到登录页面，这里设置为自定义的方式
+		 * 未授权处理
 		 */
 		http.exceptionHandling().authenticationEntryPoint(ssdcLoginUrlAuthenticationEntryPoint);
+		
+		// 权限不足处理
+		http.exceptionHandling().accessDeniedHandler(ssdcAccessDeniedHandler);
 		
 		http
 		/*
@@ -169,8 +180,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				
 				.authorizeRequests()  // 定义哪些URL需要被保护、哪些不需要被保护
 //				.antMatchers("/login.html", "/login").permitAll()  // 设置所有人都可以访问登录页面和登录接口
+//				.requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
 				.antMatchers("/login", "/logine").permitAll()
-				.antMatchers(HttpMethod.POST, "/hello", "/logine").permitAll()  // csrf 禁用才有效果
+//				.antMatchers(HttpMethod.OPTIONS).permitAll()
+//				.antMatchers(HttpMethod.POST, "/hello", "/logine").permitAll()  // csrf 禁用才有效果
 //				.antMatchers("/index").hasRole("admin")
 				
 				.anyRequest().authenticated();  // 任何请求,登录后可以访问
@@ -190,8 +203,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		 */
 		http.csrf().disable(); 
 		
-		http.rememberMe();
-				
+//		http.rememberMe();
+		
+		// 基于token，所以不需要session
+		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
 	}
 	
 	// 配置封装 SsdcAuthenticationFilter 的过滤器

@@ -18,6 +18,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.ctsi.springboot.security.authentication.SsdcAuthenticationToken.RequestType;
 import com.ctsi.springboot.security.bean.AjaxData;
 import com.ctsi.springboot.security.util.JacksonUtil;
 import com.ctsi.springboot.security.util.JwtUtil;
@@ -41,12 +42,35 @@ public class SsdcAuthenticationFilter extends
 //		super(new AntPathRequestMatcher("/logine", "POST"));
 //		log.info("ssdc #### ");
 	}
+	
+//	@Override
+//	public void doFilter(ServletRequest req, ServletResponse res,
+//			FilterChain chain) throws IOException, ServletException {
+//		
+//		HttpServletRequest request = (HttpServletRequest) req;
+//		HttpServletResponse response = (HttpServletResponse) res;
+//		log.info("登录过滤器 覆盖 " + request.getMethod());
+//		if ("OPTIONS".equals(request.getMethod())) {
+//			chain.doFilter(request, response);
+//			return;
+//		}
+//		
+//		super.doFilter(req, res, chain);
+//	}
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException,
 			IOException, ServletException {
+		log.info("登录过滤器");
 		
+		if ("OPTIONS".equals(request.getMethod())) {
+			SsdcAuthenticationToken authentication = new SsdcAuthenticationToken(new SsdcUser());
+			authentication.setRequestType(RequestType.OPTIONS);
+			return getAuthenticationManager().authenticate(authentication);
+		}
+		
+		System.out.println("请求中的全部参数");
 		// 请求中的所有参数
 		Enumeration<String> names = request.getParameterNames();
 		while (names.hasMoreElements()) {
@@ -80,12 +104,12 @@ public class SsdcAuthenticationFilter extends
 	protected void successfulAuthentication(HttpServletRequest request,
 			HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
-		log.info("ssdc successfulAuthentication #### ");
+		log.info("登录过滤器 成功的调用");
 		
 		response.setContentType("application/json;charset=UTF-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");
 //		response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-requested-with, Token"); 
-		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
+//		log.info("ssdc #### " + JacksonUtil.bean2Json(authResult));
 		
 		// 判定是否预检请求
 		if ("OPTIONS".equals(request.getMethod())) {
@@ -99,25 +123,27 @@ public class SsdcAuthenticationFilter extends
 			response.addHeader("Access-Control-Max-Age", "60"); 
 		}
 		
-		SsdcAuthenticationToken sat = (SsdcAuthenticationToken) authResult;
-//		sat.getUser().setPasswd(null);
-//		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
-//		SecurityContextHolder.getContext().setAuthentication(sat);
-		
-		Map<String, Object> claims = new HashMap<>();
-		claims.put("username", sat.getUser().getUsername());
-		String token = JwtUtil.generateToken(claims);
-		
-		AjaxData ajaxData = new AjaxData(0, "OK");
-		ajaxData.setToken(token);
-		
-		// 这里应该生成 Token 并返回
-		try (Writer writer = response.getWriter()) {
-			log.info("ssdc #### " + JacksonUtil.bean2Json(ajaxData));
-			writer.write(JacksonUtil.bean2Json(ajaxData));
-		} 
-		catch (Exception ex) {
-			ex.printStackTrace();
+		if ("GET".equals(request.getMethod())) {
+			SsdcAuthenticationToken sat = (SsdcAuthenticationToken) authResult;
+	//		sat.getUser().setPasswd(null);
+	//		log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
+	//		SecurityContextHolder.getContext().setAuthentication(sat);
+			
+			Map<String, Object> claims = new HashMap<>();
+			claims.put("username", sat.getUser().getUsername());
+			String token = JwtUtil.generateToken(claims);
+			
+			AjaxData ajaxData = new AjaxData(0, "OK");
+			ajaxData.setToken(token);
+			
+			// 这里应该生成 Token 并返回
+			try (Writer writer = response.getWriter()) {
+//				log.info("ssdc #### " + JacksonUtil.bean2Json(ajaxData));
+				writer.write(JacksonUtil.bean2Json(ajaxData));
+			} 
+			catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 	}
 	

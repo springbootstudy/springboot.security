@@ -14,12 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.util.StringUtils;
 
-import com.ctsi.springboot.security.util.JacksonUtil;
 import com.ctsi.springboot.security.util.JwtUtil;
 
 /**
@@ -44,7 +42,7 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 	protected void doFilterInternal(HttpServletRequest request,
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		log.info("ssdc #### doFilterInternal ");
+		log.info("非登录请求的过滤");
 		String method = request.getMethod();
 		String token = request.getHeader("token");
 		log.info("ssdc #### " + method + ", " + request.getRequestURI() + ", " + token);
@@ -62,6 +60,8 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS, DELETE");
 			// 单位秒
 			response.addHeader("Access-Control-Max-Age", "60"); 
+			
+			return;
 		}
 		
 		if (StringUtils.isEmpty(token)) {
@@ -75,20 +75,20 @@ public class SsdcAuthenticationTokenFilter extends BasicAuthenticationFilter {
 				String username = (String) claims.get("username");
 				log.info("ssdc #### " + username);
 				
-//				SsdcUser user = new SsdcUser();
-//				user.setUsername(username);
+				SsdcUser user = new SsdcUser();
+				user.setUsername(username);
 //				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(user, Collections.emptyList());
 				
-				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-				log.info("ssdc #### " + auth);
+//				Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//				log.info("ssdc #### " + auth);
 				
-				
-				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(null, Collections.emptyList());
-				log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
+				// 设置 认证通过
+				SsdcAuthenticationToken sat = new SsdcAuthenticationToken(user, Collections.emptyList());
+//				log.info("ssdc #### " + JacksonUtil.bean2Json(sat));
 				SecurityContextHolder.getContext().setAuthentication(sat);
 				
-				auth = SecurityContextHolder.getContext().getAuthentication();
-				log.info("ssdc #### " + auth + ", " + JacksonUtil.bean2Json(auth));
+//				auth = SecurityContextHolder.getContext().getAuthentication();
+//				log.info("ssdc #### " + JacksonUtil.bean2Json(auth));
 //				filterChain.doFilter(request, response);
 			}
 			catch (ExpiredJwtException ex) {

@@ -1,4 +1,4 @@
-package com.ctsi.springboot.security.config;
+package com.ctsi.springboot.security.authentication;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -27,6 +27,8 @@ import com.ctsi.springboot.security.util.JacksonUtil;
  * 默认情况下登陆失败会跳转页面，这里可以进行自定义：
  * 返回 json 字符串
  * 或者是其他(前后端分离里，不要跳转页面，因为没有)
+ * 
+ * 未授权处理
  *
  */
 @Component
@@ -39,7 +41,7 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 	public void commence(HttpServletRequest request,
 			HttpServletResponse response, AuthenticationException authException)
 			throws IOException, ServletException {
-//		log.info("0000 重写");
+		log.info("未授权处理");
 		response.setContentType("application/json;charset=UTF-8");
 		response.setHeader("Access-Control-Allow-Origin", "*");  
 		
@@ -55,15 +57,17 @@ public class SsdcLoginUrlAuthenticationEntryPoint implements AuthenticationEntry
 			response.addHeader("Access-Control-Max-Age", "60"); 
 		}
 		
-		log.info("0000 token为空");
-		AjaxData ajaxData = null;
-		try ( Writer writer = response.getWriter() ) {
-			ajaxData = new AjaxData(1000, "请登录系统");
-			log.info("0000 " + JacksonUtil.bean2Json(ajaxData));
-			writer.write(JacksonUtil.bean2Json(ajaxData));
-		}
-		catch (Exception ex) {
-			ex.printStackTrace();
+		if (!"OPTIONS".equals(request.getMethod())) {
+			log.info("token为空");
+			AjaxData ajaxData = null;
+			try ( Writer writer = response.getWriter() ) {
+				ajaxData = new AjaxData(1000, "请登录系统");
+				log.info("0000 " + JacksonUtil.bean2Json(ajaxData));
+				writer.write(JacksonUtil.bean2Json(ajaxData));
+			}
+			catch (Exception ex) {
+				ex.printStackTrace();
+			}
 		}
 		
 //		this.isAjaxRequest(request);

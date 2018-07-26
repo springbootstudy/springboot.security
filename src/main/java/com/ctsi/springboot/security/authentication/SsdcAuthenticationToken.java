@@ -22,12 +22,18 @@ public class SsdcAuthenticationToken extends AbstractAuthenticationToken {
 	 */
 	private static final long serialVersionUID = 3168600788812578634L;
 	
+	public enum RequestType {
+		OPTIONS
+	}
+	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(SsdcAuthenticationToken.class);
 	
 //	private String eUsername;
 //	private String ePassword;
 	
 	private SsdcUser user;
+	private RequestType requestType;
 
 //	public SsdcAuthenticationToken(
 //			Collection<? extends GrantedAuthority> authorities) {
@@ -71,6 +77,14 @@ public class SsdcAuthenticationToken extends AbstractAuthenticationToken {
 
 	public void setUser(SsdcUser user) {
 		this.user = user;
+	}
+
+	public RequestType getRequestType() {
+		return requestType;
+	}
+
+	public void setRequestType(RequestType requestType) {
+		this.requestType = requestType;
 	}
 
 //	public String geteUsername() {

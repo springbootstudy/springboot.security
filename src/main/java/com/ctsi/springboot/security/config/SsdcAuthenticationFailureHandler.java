@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.stereotype.Component;
 
 /**
  * 
@@ -21,7 +20,7 @@ import org.springframework.stereotype.Component;
  * 登录验证失败的处理
  *
  */
-@Component
+//@Component
 public class SsdcAuthenticationFailureHandler implements
 		AuthenticationFailureHandler {
 	
