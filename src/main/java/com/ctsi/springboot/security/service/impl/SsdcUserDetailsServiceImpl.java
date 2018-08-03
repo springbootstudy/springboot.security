@@ -1,7 +1,5 @@
 package com.ctsi.springboot.security.service.impl;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -10,7 +8,6 @@ import com.ctsi.springboot.security.authentication.SsdcUser;
 import com.ctsi.springboot.security.bean.SsdcUserDetails;
 import com.ctsi.springboot.security.exception.UserNotFoundException;
 import com.ctsi.springboot.security.service.SsdcUserDetailsService;
-import com.ctsi.springboot.security.util.JacksonUtil;
 
 /**
  * 
