@@ -1,22 +1,35 @@
 package com.ctsi.springboot.security.config;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsUtils;
 
+import com.ctsi.springboot.security.authentication.SsdcAccessDecisionVoter;
 import com.ctsi.springboot.security.authentication.SsdcAccessDeniedHandler;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationFilter;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationProvider;
 import com.ctsi.springboot.security.authentication.SsdcAuthenticationTokenFilter;
+import com.ctsi.springboot.security.authentication.SsdcFilterInvocationSecurityMetadataSource;
 import com.ctsi.springboot.security.authentication.SsdcLoginUrlAuthenticationEntryPoint;
 
 /**
@@ -28,9 +41,11 @@ import com.ctsi.springboot.security.authentication.SsdcLoginUrlAuthenticationEnt
  */
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+//@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+public class SsdcSecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	private static final Logger logger = Logger.getLogger(SecurityConfig.class);
+	private static final Logger log = Logger.getLogger(SsdcSecurityConfig.class);
 	
 //	@Autowired
 //	private UserDetailsService userDetailsService;
@@ -65,7 +80,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth)
 			throws Exception {
-		logger.info("@@ configure ");
+		log.info("@@ configure ");
 //		super.configure(auth);
 		
 		// start 内存方式
@@ -148,7 +163,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		logger.info("@@ configure HttpSecurity ");
+		log.info("@@ configure HttpSecurity ");
 //		super.configure(http);
 		
 //		http.authorizeRequests()
@@ -185,6 +200,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //				.antMatchers(HttpMethod.OPTIONS).permitAll()
 //				.antMatchers(HttpMethod.POST, "/hello", "/logine").permitAll()  // csrf 禁用才有效果
 //				.antMatchers("/index").hasRole("admin")
+//				.antMatchers("/index").hasRole("user")
 				
 				.anyRequest().authenticated();  // 任何请求,登录后可以访问
 				
@@ -195,6 +211,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //		http.addFilter(ssdcAuthenticationFilter);
 		http.addFilterBefore(ssdcAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
 		http.addFilterAfter(new SsdcAuthenticationTokenFilter(authenticationManager()), SsdcAuthenticationFilter.class);
+		
+//		http.authorizeRequests().accessDecisionManager(accessDecisionManager());
+		
+		// 自定义FilterInvocationSecurityMetadataSource
+        http.authorizeRequests().withObjectPostProcessor(new ObjectPostProcessor<FilterSecurityInterceptor>() {
+			
+			@Override
+			public <O extends org.springframework.security.web.access.intercept.FilterSecurityInterceptor> O postProcess(
+					O object) {
+				object.setSecurityMetadataSource(mySecurityMetadataSource(object.getSecurityMetadataSource()));
+				return object;
+			}
+			
+		});
+        
+        
 		
 		/*
 		 * 关闭，可以访问 post 请求
@@ -218,6 +250,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		// 重写认证失败时的跳转页面
 //		ssdcAuthenticationFilter.setAuthenticationFailureHandler(new SimpleUrlAuthenticationFailureHandler("/ipLogin?error"));
 		return ssdcAuthenticationFilter;
+	}
+	
+	@Bean
+	public AccessDecisionManager accessDecisionManager() {
+		List<AccessDecisionVoter<? extends Object>> decisionVoters = Arrays
+				.asList(
+						new WebExpressionVoter(),
+						// new RoleVoter(),
+						new SsdcAccessDecisionVoter(), 
+						new AuthenticatedVoter());
+		return new UnanimousBased(decisionVoters);
+	}
+	
+	@Bean
+	public SsdcFilterInvocationSecurityMetadataSource mySecurityMetadataSource(
+			FilterInvocationSecurityMetadataSource filterInvocationSecurityMetadataSource) {
+		SsdcFilterInvocationSecurityMetadataSource securityMetadataSource = new SsdcFilterInvocationSecurityMetadataSource(
+				filterInvocationSecurityMetadataSource);
+		
+		return securityMetadataSource;
 	}
 	
 //	@Bean

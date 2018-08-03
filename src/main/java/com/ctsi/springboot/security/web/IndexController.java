@@ -18,35 +18,37 @@ import com.ctsi.springboot.security.util.JwtUtil;
 @RestController
 public class IndexController {
 	
-	private static final Logger logger = Logger.getLogger(IndexController.class);
+	private static final Logger log = Logger.getLogger(IndexController.class);
 	
 //	@Autowired
 //	private FilterConfig filterConfig;
 	
+//	@PreAuthorize("hasRole('user')")
+//	@PreAuthorize("hasPermission(null, 'read')")
 	@RequestMapping("/index")
 	public ResponseEntity<String> index(HttpSession session) {
-		logger.info("## Index " + session.getId());
+		log.info("## Index " + session.getId());
 		
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/hello", method = RequestMethod.POST)
 	public ResponseEntity<String> hello(HttpSession session) {
-		logger.info("## Hello " + session.getId());
+		log.info("## Hello " + session.getId());
 		
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/world", method = RequestMethod.POST)
 	public ResponseEntity<String> world(HttpSession session) {
-		logger.info("## World " + session.getId());
+		log.info("## World " + session.getId());
 		
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
 	
 	@RequestMapping("/welcome")
 	public ResponseEntity<String> welcome(HttpSession session) {
-		logger.info("## Welcome " + session.getId());
+		log.info("## Welcome " + session.getId());
 		
 		return new ResponseEntity<String>("OK-" + session.getId(), HttpStatus.OK);
 	}
@@ -56,7 +58,7 @@ public class IndexController {
 		String username = user.getUsername();
 		String passwd = user.getPasswd();
 		
-		logger.info("## post login " + username + ", " + passwd);
+		log.info("## post login " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -80,7 +82,7 @@ public class IndexController {
 		String username = user.getUsername();
 		String passwd = user.getPasswd();
 		
-		logger.info("## post logine " + username + ", " + passwd);
+		log.info("## post logine " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -102,7 +104,7 @@ public class IndexController {
 	
 	@RequestMapping("/login")
 	public Object login(String username, String passwd) {
-		logger.info("## get login " + username + ", " + passwd);
+		log.info("## get login " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -127,7 +129,7 @@ public class IndexController {
 	
 	@RequestMapping("/mylogin")
 	public Object mylogin(String username, String passwd) {
-		logger.info("## get mylogin " + username + ", " + passwd);
+		log.info("## get mylogin " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
@@ -154,7 +156,7 @@ public class IndexController {
 	public Object mylogin(@RequestBody User user) {
 		String username = user.getUsername();
 		String passwd = user.getPasswd();
-		logger.info("## get login " + username + ", " + passwd);
+		log.info("## get login " + username + ", " + passwd);
 		
 		Map<String, Object> map = new HashMap<String, Object>();
 		
